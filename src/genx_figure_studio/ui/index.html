@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GenX Figure Studio</title>
+  <style>/* STUDIO_CSS */</style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">g<span>χ</span></span><div><strong>GenX <span>Figure Studio</span></strong><small>REFLECTOMETRY WORKSPACE</small></div></div>
+    <div class="header-actions"><span class="local-badge"><i></i> Local workspace</span><button class="primary" id="export-top" disabled>Export PDF <span aria-hidden="true">↗</span></button></div>
+  </header>
+  <main class="workspace">
+    <aside class="datasets-panel" aria-label="Datasets">
+      <div class="panel-heading"><h2>Datasets <span class="count" id="dataset-count">0</span></h2><button id="clear" class="text-button" disabled>Clear</button></div>
+      <button id="add-files" class="import-button" disabled><span aria-hidden="true">＋</span> Import GenX files</button>
+      <p class="caption">.dat or .txt · measured data &amp; model</p>
+      <div id="dataset-list" class="dataset-list"></div>
+      <div class="dataset-empty" id="dataset-empty"><span class="empty-stack" aria-hidden="true">≋</span><strong>Your data, beautifully plotted.</strong><p>Import one or more GenX exports.<br>Each dataset gets its own style.</p></div>
+      <div class="sidebar-footer"><span class="eyebrow">PLOT KEY</span><div><span class="key-point"></span> Measured <span class="key-line"></span> Model</div><p>Measured reflectivity &amp; GenX fits.<br>All processing stays on this computer.</p></div>
+    </aside>
+    <section class="preview-panel" aria-label="Figure preview">
+      <div class="preview-toolbar"><div><span class="eyebrow">FIGURE 01</span><h1>Reflectivity</h1></div><span class="preview-badge">Live preview</span></div>
+      <div class="canvas-area" id="canvas-area">
+        <div class="paper" id="paper">
+          <img id="figure-image" alt="Reflectivity figure preview" hidden>
+          <div id="figure-empty" class="figure-empty"><svg viewBox="0 0 100 70" aria-hidden="true"><path class="icon-axis" d="M12 8v51h78"/><path class="icon-curve" d="M17 15c8 0 9 27 19 19s8 4 16 7 10-6 15 2 12 3 20 5"/><circle cx="22" cy="19" r="2.2"/><circle cx="34" cy="35" r="2.2"/><circle cx="50" cy="40" r="2.2"/><circle cx="68" cy="45" r="2.2"/><circle cx="83" cy="49" r="2.2"/></svg><h2>A figure worth publishing.</h2><p>Start with your GenX data, then refine<br>every detail for your manuscript.</p><button id="empty-import" class="primary" disabled>Import data <span aria-hidden="true">＋</span></button></div>
+        </div>
+      </div>
+      <div class="preview-meta"><span id="figure-size">182.9 × 121.9 mm</span><span>Vector preview <span class="dot">·</span> <span id="zoom-label">Fit to view</span></span><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-in" aria-label="Zoom in">＋</button></div></div>
+      <div id="notes" class="notes" hidden></div>
+      <div id="error" class="error" role="alert" hidden></div>
+    </section>
+    <aside class="inspector" aria-label="Figure settings">
+      <div class="panel-heading"><h2>Figure settings</h2><button id="reset" class="text-button" disabled>Reset</button></div>
+      <form id="settings" novalidate>
+        <details open><summary>Layout <span>01</span></summary><div class="section-content">
+          <label>Arrangement<select name="arrangement"><option value="overlay">Combined · one figure</option><option value="stack">Column stack · one panel per dataset</option><option value="table">Figure table · grid of panels</option></select></label>
+          <label id="panelcols-field" hidden>Table columns<input name="panelcols" type="number" min="1" max="4" step="1"></label>
+          <p id="layout-help" class="help">All selected datasets share one set of axes.</p>
+          <label>Size preset<select id="preset"><option value="single">Single column · 85 mm</option><option value="double" selected>Double column · 183 mm</option><option value="presentation">Presentation · 254 mm</option><option value="custom">Custom</option></select></label>
+          <div class="field-pair"><label>Width <span class="unit">in</span><input name="width" type="number" min="1.5" max="20" step="0.01"></label><label>Height <span class="unit">in</span><input name="height" type="number" min="1.5" max="20" step="0.01"></label></div>
+          <label>Figure title<input name="title" placeholder="Optional title"></label>
+        </div></details>
+        <details open><summary>Axes &amp; labels <span>02</span></summary><div class="section-content">
+          <label>Y-axis scale<select name="scale"><option value="log">Logarithmic</option><option value="linear">Linear</option></select></label>
+          <label>X-axis label<input name="xlabel" spellcheck="false"></label><label>Y-axis label<input name="ylabel" spellcheck="false"></label>
+          <div class="field-pair"><label>X minimum<input name="xmin" placeholder="Auto" inputmode="decimal"></label><label>X maximum<input name="xmax" placeholder="Auto" inputmode="decimal"></label></div>
+          <div class="field-pair"><label>Y minimum<input name="ymin" placeholder="Auto" inputmode="decimal"></label><label>Y maximum<input name="ymax" placeholder="Auto" inputmode="decimal"></label></div>
+          <button id="auto-limits" type="button" class="text-button">Use automatic limits</button><p class="help">Math notation supported, e.g. $Q_z$.</p>
+        </div></details>
+        <details><summary>Typography &amp; style <span>03</span></summary><div class="section-content">
+          <label>Typeface<select name="font"><option value="sans-serif">Sans serif · DejaVu Sans</option><option value="serif">Serif · DejaVu Serif</option></select></label>
+          <div class="field-pair"><label>Font size <span class="unit">pt</span><input name="fontsize" type="number" min="5" max="32" step="0.5"></label><label>Marker size <span class="unit">pt</span><input name="markersize" type="number" min="0.5" max="15" step="0.1"></label></div>
+          <label>Model line width <span class="unit">pt</span><input name="linewidth" type="number" min="0.2" max="8" step="0.1"></label>
+          <label class="toggle"><input name="errors" type="checkbox"><span>Measurement error bars</span></label><label class="toggle"><input name="grid" type="checkbox"><span>Major &amp; minor grid</span></label>
+        </div></details>
+        <details><summary>Legend <span>04</span></summary><div class="section-content">
+          <label class="toggle"><input name="legend" type="checkbox"><span>Show legend</span></label>
+          <div class="field-pair"><label>Position<select name="legendloc"><option value="best">Automatic</option><option>upper right</option><option>upper left</option><option>lower right</option><option>lower left</option></select></label><label>Columns<input name="legendcols" type="number" min="1" max="6" step="1"></label></div>
+        </div></details>
+        <details><summary>Background cutoff <span>05</span></summary><div class="section-content">
+          <label>Instrumental background<input name="background" inputmode="decimal"></label>
+          <label class="toggle"><input name="mask" type="checkbox"><span>Hide points below cutoff</span></label><label class="toggle"><input name="clip" type="checkbox"><span>Clip model to cutoff</span></label><p class="help">Applied on logarithmic axes only. Original data are preserved.</p>
+        </div></details>
+      </form>
+      <section class="export-panel" id="export-panel" aria-label="Export">
+        <div class="export-heading"><h2>Export figure</h2><span class="vector-tag" id="format-tag">VECTOR</span></div>
+        <label for="export-format">File format</label><select id="export-format"><option value="pdf">PDF · vector, embedded fonts</option><option value="svg">SVG · editable vector</option><option value="png">PNG · high-resolution image</option></select>
+        <label id="dpi-field" hidden>Resolution <span class="unit">DPI</span><input name="dpi" form="settings" type="number" min="72" max="1200" step="1"></label>
+        <p class="help" id="format-help">Vector artwork with embedded fonts.<br>Best for manuscript submission.</p>
+        <button class="primary full-width" id="export" disabled>Export PDF <span aria-hidden="true">↗</span></button>
+      </section>
+    </aside>
+  </main>
+  <footer class="statusbar"><div><span id="status-dot" class="status-dot"></span><span id="status" role="status">Connecting to the plotting engine…</span></div><span id="selection-status">No datasets loaded</span></footer>
+  <template id="dataset-template"><article class="dataset-card"><div class="dataset-title"><label class="visibility"><input type="checkbox" data-field="visible" aria-label="Show dataset"><span class="dataset-name"></span></label><button class="remove-dataset" aria-label="Remove dataset" title="Remove dataset">×</button></div><p class="dataset-info"></p><label>Legend label<input data-field="label" spellcheck="false"></label><div class="dataset-style"><label>Color<input type="color" data-field="color"></label><label>Marker<select data-field="marker"><option value="o">○ Circle</option><option value="s">□ Square</option><option value="^">△ Up</option><option value="v">▽ Down</option><option value="D">◇ Diamond</option><option value=".">· Point</option><option value="x">× Cross</option><option value="+">＋ Plus</option></select></label><label>Model<select data-field="line"><option value="-">Solid</option><option value="--">Dashed</option><option value="-.">Dash-dot</option><option value=":">Dotted</option></select></label></div><div class="field-pair dataset-sizes"><label>Marker size <span class="unit">pt</span><input data-field="markersize" type="number" min="0.5" max="15" step="0.1"></label><label>Line width <span class="unit">pt</span><input data-field="linewidth" type="number" min="0.2" max="8" step="0.1"></label></div></article></template>
+  <script>/* STUDIO_JS */</script>
+</body>
+</html>
