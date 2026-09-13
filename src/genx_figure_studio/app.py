@@ -61,34 +61,39 @@ class StudioAPI:
             return dict(error=str(exc))
 
     def export(self, rows, settings, extension):
-        import webview
         try:
             content, notes = render_figure(self._resolve(rows), settings, extension)
-            paths = self._window.create_file_dialog(webview.FileDialog.SAVE,
-                        save_filename=f"reflectivity.{extension}",
-                        file_types=(f"{extension.upper()} figure (*.{extension})",))
-            if not paths:
-                return dict(cancelled=True)
-            path = Path(paths if isinstance(paths, str) else paths[0])
-            if not path.suffix:
-                path = path.with_suffix("." + extension)
-                if path.exists() and not self._window.create_confirmation_dialog(
-                        "Replace figure?", f"{path.name} already exists. Replace it?"):
-                    return dict(cancelled=True)
-            if path.suffix.lower() != "." + extension:
-                raise ValueError(f"Use a .{extension} filename for this export format.")
-            temporary = None
-            try:
-                with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as output:
-                    temporary = output.name
-                    output.write(content)
-                os.replace(temporary, path)
-            finally:
-                if temporary and os.path.exists(temporary):
-                    os.unlink(temporary)
-            return dict(path=str(path), notes=notes)
+            return save_figure(self._window, content, extension, "reflectivity", notes)
         except (OSError, ValueError, KeyError, TypeError) as exc:
             return dict(error=str(exc))
+
+
+def save_figure(window, content, extension, filename, notes=()):
+    """Save rendered bytes through a native dialog, replacing files atomically."""
+    import webview
+    paths = window.create_file_dialog(webview.FileDialog.SAVE,
+                save_filename=f"{filename}.{extension}",
+                file_types=(f"{extension.upper()} figure (*.{extension})",))
+    if not paths:
+        return dict(cancelled=True)
+    path = Path(paths if isinstance(paths, str) else paths[0])
+    if not path.suffix:
+        path = path.with_suffix("." + extension)
+        if path.exists() and not window.create_confirmation_dialog(
+                "Replace figure?", f"{path.name} already exists. Replace it?"):
+            return dict(cancelled=True)
+    if path.suffix.lower() != "." + extension:
+        raise ValueError(f"Use a .{extension} filename for this export format.")
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as output:
+            temporary = output.name
+            output.write(content)
+        os.replace(temporary, path)
+    finally:
+        if temporary and os.path.exists(temporary):
+            os.unlink(temporary)
+    return dict(path=str(path), notes=notes)
 
 
 def main():

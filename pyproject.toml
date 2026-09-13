@@ -15,6 +15,7 @@ dependencies = [
 
 [project.scripts]
 genx-figure-studio = "genx_figure_studio.app:main"
+genx-magnetization-studio = "genx_figure_studio.magnetization_app:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

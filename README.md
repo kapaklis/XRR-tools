@@ -80,3 +80,13 @@ Tests cover parsing, uncertainty handling, masking, settings validation, exact P
 6. 2x2 PNR-panel figure mode;
 7. improved legend composition;
 8. tests for file parsing and plotting state.
+
+## Magnetization editor
+
+Run `python magnetization_profile.py` to open the editor with the fitted angles and moments stored in that script. To start with an empty editor, run `python -m genx_figure_studio.magnetization_app` (or `genx-magnetization-studio` after reinstalling the package).
+
+Paste angle values in degrees, a comma-separated list, or GenX parameter rows containing `magn_ang`. For other multi-column tables, explicitly select the angle column. Choose whether input runs from substrate to surface or the reverse. Optional moments accept a shared magnitude or one value per angle; blank means equal-length direction arrows. The parsed-values panel lets you verify the mapping before export.
+
+The live vector preview uses a translucent Fe/MgO stack inspired by Figure 3 of [Phys. Rev. B 97, 174424](https://doi.org/10.1103/PhysRevB.97.174424). Controls cover titles, custom layer labels, colors, fonts, arrow sizes, field direction, visibility, projection, figure dimensions, and footnotes. Layers are schematic; thickness values appear in the editable note. Fe1 remains substrate-adjacent, with angles measured counterclockwise from +x in the film plane. Projection foreshortens arrows; supplied magnitudes are displayed without unit conversion.
+
+Choose PDF, SVG, or PNG in the editor before opening the native save dialog. PDF embeds fonts; SVG preserves editable text. Settings apply to preview and export, and invalid inputs disable export. Edits last for the current session; exports do not modify the input script. `python magnetization_profile.py --plot` retains the direct plotting workflow. The reusable plotting function is `genx_figure_studio.magnetization.plot_genx_magnetization`.
